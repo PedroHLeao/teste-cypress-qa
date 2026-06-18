@@ -1,28 +1,44 @@
 import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor";
+import loginPage from "../../pages/loginPage";
+
 
 let nomeProduto;
 
 //Realizar buscar;
-Given("que estou na tela de login", () => {
-  cy.visit("https://www.automationexercise.com/login");
+Given("que estou na tela de login com acesso válido", () => {
+  loginPage.acessarLogin();
 });
 
 When("faço login com usuário válido", () => {
-  cy.get('input[data-qa="login-email"]').type("pedro@teste.com.br");
-  cy.get('input[data-qa="login-password"]').type("123456");
-  cy.get('button[data-qa="login-button"]').click();
-cy.contains("Logout", { timeout: 10000 }).should("be.visible");
+  loginPage.preencherEmail("pedro@teste.com.br");
+  loginPage.preencherSenhaValida("123456");
+  loginPage.clicarLogin();
   
 });
 
 Then("vejo que estou logado", () => {
-  cy.contains("Logout", { timeout: 10000 }).should("be.visible");
+  loginPage.validarLoginComSucesso();
+});
+
+//  Login inválido
+Given("que estou na tela de login com acesso inválido", () => {
+  loginPage.acessarLogin();
+});
+
+When("faço login com senha inválida", () => {
+  loginPage.preencherEmail("pedro@teste.com.br");
+  loginPage.preencherSenhaValida("0000");
+  loginPage.clicarLogin();
+});
+
+Then("devo ver mensagem de erro", () => {
+  loginPage.validarErroLogin();
 });
 
 // Incluir produto no carrinho;
 
 Given("que estou na home", () => {
-  cy.visit("https://www.automationexercise.com/");
+  loginPage.acessarLogin();
 });
 
 When("adiciono um produto ao carrinho", () => {
@@ -61,6 +77,6 @@ Then("o status deve ser 200", function () {
 
 Then("exibo o nome da lista", function () {
   cy.get("@res").then((response) => {
-    cy.log(response.body.data.list.name);
+    expect(response.body.data.list.name).to.not.be.empty;
   });
 });
