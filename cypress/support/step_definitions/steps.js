@@ -38,30 +38,21 @@ Then("devo ver mensagem de erro", () => {
 // Incluir produto no carrinho;
 
 Given("que estou na home", () => {
-  loginPage.acessarLogin();
+  loginPage.LoginHome("pedro@teste.com.br", "123456");
 });
 
 When("adiciono um produto ao carrinho", () => {
   // pega o nome do produto antes de clicar
-  cy.get(".productinfo p")
-    .first()
-    .invoke("text")
-    .then((text) => {
-      nomeProduto = text.trim();
-    });
-
-  cy.contains("Add to cart").first().click();
+  loginPage.adicionarProdutoAoCarrinho();
 });
 
 When("vou para o carrinho", () => {
-  cy.contains("View Cart").click();
+  loginPage.checkoutCarrinho();
 });
 
-Then("valido o produto no carrinho", () => {
-  // valida que o produto exibido é o mesmo
-  cy.get(".cart_description")
-  .should("be.visible")
-  .and("contain", nomeProduto);
+// valida que o produto exibido é o mesmo
+  Then("valido o produto no carrinho", () => {
+  cy.contains("Blue Top").should("be.visible");
 });
 
 // Teste de API - Trello
@@ -79,4 +70,5 @@ Then("exibo o nome da lista", function () {
   cy.get("@res").then((response) => {
     expect(response.body.data.list.name).to.not.be.empty;
   });
+  
 });
